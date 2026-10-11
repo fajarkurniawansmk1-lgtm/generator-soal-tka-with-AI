@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI TKA English Generator v3.8</title>
+  
+  <!-- CDN Bootstrap & Icons (Clean & Valid) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  
+  <style>
+    body { 
+      background-color: #f8f9fa; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .main-wrapper { flex: 1; }
+    .card-custom { 
+      border-radius: 12px; 
+      border: none; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
+    }
+    .btn-primary { 
+      background-color: #0d6efd; 
+      border: none; 
+      padding: 10px 24px; 
+      font-weight: 600; 
+    }
+    .loading-spinner { display: none; }
+    .info-box { 
+      background-color: #e7f1ff; 
+      border-left: 4px solid #0d6efd; 
+      padding: 12px 16px; 
+      border-radius: 6px; 
+      font-size: 0.88rem; 
+    }
+    .badge-kategori { background-color: #6f42c1; color: white; }
+    .token-badge { 
+      font-size: 1.8rem; 
+      letter-spacing: 4px; 
+      font-weight: 700; 
+    }
+    footer {
+      background-color: #ffffff;
+      border-top: 1px solid #e2e8f0;
+      padding: 20px 0;
+      margin-top: 40px;
+      text-align: center;
+      font-size: 0.88rem;
+      color: #64748b;
+    }
+    footer strong { color: #0d6efd; }
+  </style>
+</head>
+<body class="pt-4">
+
+  <div class="main-wrapper">
+    <div class="container" style="max-width: 850px;">
+      
+      <!-- Card Utama Form Generator -->
+      <div class="card card-custom p-4 bg-white mb-4">
+        <h3 class="fw-bold text-primary mb-1"><i class="bi bi-cpu me-2"></i>AI TKA English Generator v3.8</h3>
+        <p class="text-muted">Generator Paket Soal TKA Bahasa Inggris SMK berstandar BSKAP 2026 (HOTS & HTML Visual Stimulus).</p>
+        
+        <div class="info-box mb-3 text-secondary">
+          <i class="bi bi-info-circle-fill text-primary me-1"></i>
+          <strong>Catatan TKA 2026:</strong> Soal dikembangkan dengan konteks komunikasi dunia kerja/vokasi jurusan, <em>bukan</em> menguji materi kejuruan teknis (seperti rumus/perhitungan akuntansi/teknis mesin).
+        </div>
+        <hr>
+
+        <form id="generatorForm">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label fw-semibold">Nama Paket Ujian</label>
+              <input type="text" class="form-control" id="namaPaket" placeholder="Misal: Ujian Tengah Semester XII AKL 1" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Kelas Target</label>
+              <select class="form-select" id="kelas" required>
+                <option value="XII" selected>XII (SMK 3 Tahun)</option>
+                <option value="XIII">XIII (SMK 4 Tahun)</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Jumlah Soal</label>
+              <select class="form-select" id="jumlahSoal" required>
+                <option value="30">30 Soal (Proporsi Lengkap 9-15-6)</option>
+                <option value="20" selected>20 Soal (Proporsi Standar 6-10-4)</option>
+                <option value="10">10 Soal (Latihan Singkat 3-5-2)</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Program Keahlian / Jurusan</label>
+              <select class="form-select" id="jurusanSelect" onchange="toggleJurusanCustom()">
+                <option value="Akuntansi dan Keuangan Lembaga (AKL)" selected>Akuntansi & Keuangan (AKL)</option>
+                <option value="Teknik Kendaraan Ringan (TKR)">Teknik Kendaraan Ringan (TKR)</option>
+                <option value="Teknik Komputer dan Jaringan (TKJ)">Teknik Komputer & Jaringan (TKJ)</option>
+                <option value="Manajemen Perkantoran (MPLB)">Manajemen Perkantoran (MPLB)</option>
+                <option value="Pemasaran & Bisnis Digital">Pemasaran & Bisnis Digital</option>
+                <option value="Kuliner / Tata Boga">Kuliner / Tata Boga</option>
+                <option value="Umum / Lintas Jurusan">Umum (Lintas Jurusan)</option>
+                <option value="CUSTOM">-- Jurusan Lainnya (Ketik Manual) --</option>
+              </select>
+              <input type="text" class="form-control mt-2" id="jurusanCustom" placeholder="Ketik nama jurusan..." style="display: none;">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Dominasi Konteks Teks</label>
+              <select class="form-select" id="tema" required>
+                <option value="Proporsional TKA (40% Workplace, 30% Everyday, 30% Academic)" selected>Proporsional Standar TKA (Workplace, Everyday, Academic)</option>
+                <option value="Fokus Workplace & Business Correspondence">Fokus Workplace & Korespondensi Bisnis (Email/Memo)</option>
+                <option value="Fokus Technical Procedures & Safety SOP">Fokus Prosedur Teknis & SOP Kerja</option>
+                <option value="Fokus Customer Service & Problem Solving">Fokus Pelayanan Pelanggan & Problem Solving</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mt-4 d-flex align-items-center justify-content-between">
+            <button type="submit" class="btn btn-primary" id="btnSubmit">
+              ✨ Generate Paket Soal TKA HOTS
+            </button>
+            <div class="loading-spinner align-items-center text-primary fw-semibold" id="loading">
+              <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+              Memproses Gemini API & Membuat Database Baru...
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- CARD: CARI & CETAK PAKET LAMA -->
+      <div class="card card-custom p-4 bg-white mb-4">
+        <h5 class="fw-bold text-secondary mb-2"><i class="bi bi-printer-fill text-primary me-2"></i>Cetak / Buka Paket Soal Yang Sudah Ada</h5>
+        <p class="text-muted small mb-3">Masukkan Token Ujian (misal: UMU199) atau ID Paket (misal: PKT-211954) untuk mencetak tanpa generate ulang.</p>
+        <div class="row g-2">
+          <div class="col-md-8">
+            <input type="text" class="form-control text-uppercase font-monospace" id="tokenSearchInput" placeholder="Masukkan Token / ID Paket (Contoh: UMU199 atau PKT-211954)">
+          </div>
+          <div class="col-md-4">
+            <button type="button" class="btn btn-outline-primary w-100 fw-semibold" id="btnLoadToken" onclick="loadPaketByToken()">
+              <i class="bi bi-search me-1"></i> Buka Paket Soal
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Container Hasil -->
+      <div id="resultContainer" style="display: none;">
+        
+        <div class="alert alert-success card-custom p-4 text-center mb-4 border border-success-subtle shadow-sm">
+          <h4 class="fw-bold text-success mb-1"><i class="bi bi-check-circle-fill me-2"></i>Paket Soal & Database Berhasil Dimuat!</h4>
+          <p class="mb-2 text-secondary">Berikan Token Ujian di bawah ini kepada siswa untuk mengakses soal:</p>
+          <span class="badge bg-primary token-badge px-4 py-2 my-2" id="displayToken">TOKEN</span>
+          <div class="mt-2 text-muted small" id="displayInfoPaket"></div>
+
+          <!-- 3 TOMBOL CETAK -->
+          <div class="pt-3 border-top mt-3 d-flex gap-2 flex-wrap justify-content-center">
+            <button onclick="cetakDokumen('guru')" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
+              <i class="bi bi-printer-fill me-1"></i> Cetak Soal + Kunci (Guru)
+            </button>
+            <button onclick="cetakDokumen('siswa')" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-semibold">
+              <i class="bi bi-file-earmark-text me-1"></i> Cetak Lembar Ujian (Siswa)
+            </button>
+            <button onclick="cetakKisiKisi()" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-semibold">
+              <i class="bi bi-journal-bookmark-fill me-1"></i> Cetak Kisi-Kisi & Acuan Belajar
+            </button>
+          </div>
+        </div>
+
+        <div id="soalList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p class="mb-1">TKA English Online Generator Platform. Ver 3.8 © 2026</p>
+      <p class="mb-0">Designed & Developed by <strong>Fajar Kurniawan, S.Pd</strong></p>
+    </div>
+  </footer>
+
+  <script>
+    let currentSoalData = [];
+    let currentInfoPaket = {};
+
+    function toggleJurusanCustom() {
+      const select = document.getElementById('jurusanSelect');
+      const customInput = document.getElementById('jurusanCustom');
+      if (select.value === 'CUSTOM') {
+        customInput.style.display = 'block';
+        customInput.required = true;
+      } else {
+        customInput.style.display = 'none';
+        customInput.required = false;
+      }
+    }
+
+    document.getElementById('generatorForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let selectedJurusan = document.getElementById('jurusanSelect').value;
+      if (selectedJurusan === 'CUSTOM') {
+        selectedJurusan = document.getElementById('jurusanCustom').value;
+      }
+
+      const params = {
+        namaPaket: document.getElementById('namaPaket').value.trim(),
+        kelas: document.getElementById('kelas').value,
+        jurusan: selectedJurusan,
+        jumlahSoal: parseInt(document.getElementById('jumlahSoal').value),
+        tema: document.getElementById('tema').value
+      };
+
+      document.getElementById('btnSubmit').disabled = true;
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('resultContainer').style.display = 'none';
+
+      google.script.run
+        .withSuccessHandler(onSuccess)
+        .withFailureHandler(onFailure)
+        .generateTKASoal(params);
+    });
+
+    function onSuccess(response) {
+      document.getElementById('btnSubmit').disabled = false;
+      document.getElementById('loading').style.display = 'none';
+
+      currentSoalData = response.data || [];
+      currentInfoPaket = response.paket || {};
+
+      if (response.paket) {
+        document.getElementById('displayToken').innerText = response.paket.token;
+        document.getElementById('displayInfoPaket').innerHTML = `<strong>Nama Paket:</strong> ${response.paket.namaPaket} | <strong>Database Sheet:</strong> ${response.paket.sheetName}`;
+      }
+
+      const container = document.getElementById('resultContainer');
+      const soalListDiv = document.getElementById('soalList');
+      soalListDiv.innerHTML = '';
+
+      currentSoalData.forEach((soal, index) => {
+        let opsiMap = {};
+        let rawPilihan = soal.pilihanJawaban;
+
+        if (typeof rawPilihan === 'string') {
+          try { rawPilihan = JSON.parse(rawPilihan); } catch(e) {}
+        }
+
+        if (Array.isArray(rawPilihan)) {
+          const abjad = ["A", "B", "C", "D", "E", "F"];
+          rawPilihan.forEach((val, i) => { opsiMap[abjad[i] || (i + 1)] = val; });
+        } else if (typeof rawPilihan === 'object' && rawPilihan !== null) {
+          opsiMap = rawPilihan;
+        }
+
+        let pilihanHtml = '<ul class="list-unstyled mb-2">';
+        for (let key in opsiMap) {
+          pilihanHtml += `<li class="mb-1"><strong>${key}.</strong> ${opsiMap[key]}</li>`;
+        }
+        pilihanHtml += '</ul>';
+
+        let badgeTipeClass = 'bg-dark';
+        if (soal.tipeSoal === 'PGK-MCMA') badgeTipeClass = 'bg-warning text-dark';
+        if (soal.tipeSoal === 'PGK-Kategori') badgeTipeClass = 'badge-kategori';
+
+        let stimulusContent = soal.stimulus || '';
+        let isHtmlVisual = (soal.tipeStimulus === 'image' || soal.tipeStimulus === 'hybrid-html' || stimulusContent.trim().indexOf('<') === 0);
+
+        let stimulusBoxHtml = '';
+        if (isHtmlVisual) {
+          stimulusBoxHtml = `<div class="p-3 bg-white rounded mb-3 border shadow-sm">${stimulusContent}</div>`;
+        } else {
+          stimulusBoxHtml = `<div class="p-3 bg-light rounded mb-3 border" style="white-space: pre-wrap; font-size: 0.92em; line-height: 1.5;"><strong>Stimulus / Text:</strong>\n${stimulusContent}</div>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'card card-custom p-4 mb-3 bg-white';
+        card.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-primary fs-6">Soal #${index + 1}</span>
+            <div>
+              <span class="badge bg-secondary">${soal.kompetensi}</span>
+              <span class="badge bg-info text-dark">${soal.levelCEFR}</span>
+              <span class="badge ${badgeTipeClass}">${soal.tipeSoal}</span>
+            </div>
+          </div>
+          ${stimulusBoxHtml}
+          <p class="fw-bold text-dark mb-2">${soal.pertanyaan}</p>
+          ${pilihanHtml}
+          <div class="alert alert-warning p-2 mb-0 mt-3" style="font-size: 0.88em;">
+            <strong>Kunci Jawaban:</strong> <span class="badge bg-success">${soal.kunci}</span><br>
+            <strong>Indikator:</strong> ${soal.indikator || '-'}<br>
+            <strong>Pembahasan:</strong> ${soal.pembahasan}
+          </div>
+        `;
+        soalListDiv.appendChild(card);
+      });
+
+      container.style.display = 'block';
+    }
+
+    function onFailure(error) {
+      document.getElementById('btnSubmit').disabled = false;
+      document.getElementById('loading').style.display = 'none';
+      alert("Terjadi Kesalahan: " + error.message);
+    }
+
+    function loadPaketByToken() {
+      const token = document.getElementById('tokenSearchInput').value.trim();
+      if (!token) {
+        alert("Silakan masukkan Token Ujian atau ID Paket terlebih dahulu!");
+        return;
+      }
+
+      const btn = document.getElementById('btnLoadToken');
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Mengambil...`;
+
+      google.script.run
+        .withSuccessHandler(function(response) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="bi bi-search me-1"></i> Buka Paket Soal`;
+
+          if (!response.success && response.status !== "success") {
+            alert("Gagal: " + (response.message || "Paket tidak ditemukan."));
+            return;
+          }
+
+          onSuccess(response);
+        })
+        .withFailureHandler(function(error) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="bi bi-search me-1"></i> Buka Paket Soal`;
+          alert("Terjadi Kesalahan: " + error.message);
+        })
+        .getPaketByToken(token);
+    }
+
+    function cetakDokumen(tipe) {
+      if (!currentSoalData || currentSoalData.length === 0) {
+        alert("Data soal belum tersedia untuk dicetak!");
+        return;
+      }
+
+      const isGuru = (tipe === 'guru');
+      let win = window.open('', '_blank');
+      
+      let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${isGuru ? 'Master Soal & Pembahasan (Guru)' : 'Lembar Soal Ujian (Siswa)'}</title>
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+          <style>
+            body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; padding: 25px; line-height: 1.4; }
+            .stimulus-box { border: 1px solid #999; padding: 12px; background: #fdfdfd; margin-bottom: 15px; border-radius: 4px; }
+            .soal-item { page-break-inside: avoid; margin-bottom: 18px; }
+            .kunci-box { background: #eef9f2; border-left: 4px solid #198754; padding: 8px 12px; margin-top: 8px; font-size: 9.5pt; font-family: sans-serif; }
+            @media print {
+              .no-print { display: none !important; }
+              body { padding: 0; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print mb-4 text-end">
+            <button onclick="window.print()" class="btn btn-primary px-4 fw-bold">🖨️ Cetak / Save PDF</button>
+          </div>
+
+          <div class="text-center mb-4">
+            <h4 class="fw-bold text-uppercase mb-1">TES KEMAMPUAN AKADEMIK (TKA) BAHASA INGGRIS 2026</h4>
+            <h6 class="text-secondary mb-0">PAKET: ${(currentInfoPaket.namaPaket || 'LATIHAN TKA').toUpperCase()}</h6>
+            <hr style="border-top: 2px solid #000; opacity: 1;" class="mt-2 mb-4">
+          </div>
+      `;
+
+      let currentStimulus = "";
+      currentSoalData.forEach((item, index) => {
+        if (item.stimulus && item.stimulus !== currentStimulus) {
+          currentStimulus = item.stimulus;
+          html += `
+            <div class="stimulus-box">
+              <strong style="font-family: sans-serif;"><u>READING PASSAGE / STIMULUS:</u></strong><br>
+              <div class="mt-2">${item.stimulus}</div>
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="soal-item">
+            <p class="mb-1"><strong>${index + 1}. ${item.pertanyaan}</strong></p>
+            <ol type="A" class="mb-2" style="padding-left: 20px;">
+        `;
+
+        let rawPilihan = item.pilihanJawaban;
+        let opsiMap = {};
+        if (typeof rawPilihan === 'string') { try { rawPilihan = JSON.parse(rawPilihan); } catch(e){} }
+        if (Array.isArray(rawPilihan)) {
+          const abjad = ["A", "B", "C", "D", "E"];
+          rawPilihan.forEach((v, i) => { opsiMap[abjad[i]] = v; });
+        } else if (typeof rawPilihan === 'object' && rawPilihan !== null) {
+          opsiMap = rawPilihan;
+        }
+
+        for (let key in opsiMap) {
+          let isCorrect = (isGuru && item.kunci && item.kunci.includes(key));
+          let style = isCorrect ? 'font-weight: bold; color: #198754;' : '';
+          html += `<li style="${style}">${opsiMap[key]} ${isCorrect ? '✓' : ''}</li>`;
+        }
+
+        html += `</ol>`;
+
+        if (isGuru) {
+          html += `
+            <div class="kunci-box">
+              <strong>Kunci Jawaban:</strong> <span class="badge bg-success">${item.kunci}</span> | 
+              <strong>CEFR:</strong> ${item.levelCEFR || 'B1'} | 
+              <strong>Tipe:</strong> ${item.tipeSoal}<br>
+              <strong>Kompetensi:</strong> ${item.kompetensi}<br>
+              <strong>Pembahasan:</strong> ${item.pembahasan}<br>
+              ${item.indikator ? `<strong>Indikator:</strong> ${item.indikator}` : ''}
+            </div>
+          `;
+        }
+
+        html += `</div>`;
+      });
+
+      html += `</body></html>`;
+      win.document.write(html);
+      win.document.close();
+    }
+
+    function cetakKisiKisi() {
+      if (!currentSoalData || currentSoalData.length === 0) {
+        alert("Data kisi-kisi belum tersedia!");
+        return;
+      }
+
+      let win = window.open('', '_blank');
+      let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Kisi-Kisi & Acuan Belajar Siswa</title>
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+          <style>
+            body { font-family: Arial, sans-serif; font-size: 9.5pt; padding: 25px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { border: 1px solid #444; padding: 7px 9px; vertical-align: top; }
+            th { background-color: #e9ecef; text-align: center; font-weight: bold; }
+            @media print { .no-print { display: none !important; } body { padding: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="no-print mb-4 text-end">
+            <button onclick="window.print()" class="btn btn-success px-4 fw-bold">🖨️ Cetak Kisi-Kisi / Save PDF</button>
+          </div>
+
+          <div class="text-center mb-3">
+            <h4 class="fw-bold mb-1">KISI-KISI & ACUAN BELAJAR SISWA (TKA BAHASA INGGRIS)</h4>
+            <p class="text-secondary mb-0">Paket: ${(currentInfoPaket.namaPaket || 'Latihan Ujian').toUpperCase()}</p>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th width="5%">No</th>
+                <th width="15%">Jenis Teks</th>
+                <th width="22%">Kompetensi Diuji</th>
+                <th width="8%">Level</th>
+                <th width="25%">Indikator Ketercapaian</th>
+                <th width="25%">Fokus & Strategy Belajar Siswa</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      currentSoalData.forEach((item, index) => {
+        let tips = "";
+        let komp = item.kompetensi || "";
+        
+        if (komp.includes("Tekstual")) {
+          tips = "Latih teknik <i>scanning</i> fakta eksplisit, mencari angka/nama, dan mengurutkan tahapan prosedur/kerangka.";
+        } else if (komp.includes("Inferensial")) {
+          tips = "Latih menyimpulkan ide pokok, mencari makna frasa kontekstual, dan memahami hubungan sebab-akibat tersirat.";
+        } else {
+          tips = "Latih menganalisis sudut pandang/sikap penulis, menilai kebenaran argumen, dan memilih tindakan terbaik sesuai bacaan.";
+        }
+
+        html += `
+          <tr>
+            <td class="text-center fw-bold">${index + 1}</td>
+            <td>${item.jenisTeks || 'Informational Text'}</td>
+            <td><b>${item.kompetensi}</b></td>
+            <td class="text-center">${item.levelCEFR || 'B1'}</td>
+            <td>${item.indikator || item.pertanyaan}</td>
+            <td>${tips}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </body>
+        </html>
+      `;
+
+      win.document.write(html);
+      win.document.close();
+    }
+  </script>
+</body>
+</html>

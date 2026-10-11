@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Evaluasi Guru - CBT TKA</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- FontAwesome 6 Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --primary-light: #eef2ff;
+      --bg-slate: #f8fafc;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    body {
+      background-color: var(--bg-slate);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    /* Glassmorphism Header */
+    .header-banner {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4f46e5 100%);
+      border-radius: 20px;
+      color: white;
+      padding: 28px 32px;
+      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .header-logo {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    }
+
+    /* Modern Cards */
+    .card-modern {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      box-shadow: 0 4px 15px -2px rgba(15, 23, 42, 0.03);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .card-modern:hover {
+      box-shadow: 0 12px 25px -5px rgba(15, 23, 42, 0.08);
+    }
+
+    /* Interactive Metric Cards */
+    .metric-card {
+      background: #ffffff;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.06);
+    }
+
+    .metric-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+    }
+
+    /* Progress bar in table */
+    .comp-progress {
+      height: 6px;
+      border-radius: 10px;
+      background-color: #e2e8f0;
+      overflow: hidden;
+    }
+    
+    .comp-progress .progress-bar {
+      border-radius: 10px;
+    }
+
+    /* Custom Badges */
+    .badge-score-high {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      color: white;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    }
+
+    .badge-score-low {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      color: white;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+    }
+
+    /* Footer Signature */
+    footer {
+      background-color: #ffffff;
+      border-top: 1px solid var(--card-border);
+      padding: 24px 0;
+      margin-top: 48px;
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    footer strong {
+      color: var(--primary);
+    }
+
+    .fs-7 { font-size: 0.8rem; }
+    .fs-8 { font-size: 0.75rem; }
+
+    /* ============================================================
+       CSS KHUSUS CETAK / EXPORT PDF (@media print)
+       ============================================================ */
+    @media print {
+      .btn, button, select, input, .input-group, .no-print {
+        display: none !important;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+      
+      body {
+        background-color: #fff !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .main-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .card-modern, .metric-card {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        break-inside: avoid;
+      }
+
+      .header-banner {
+        background: #1e1b4b !important;
+        color: #fff !important;
+        padding: 16px 20px !important;
+        box-shadow: none !important;
+      }
+
+      .table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+      }
+
+      .table th, .table td {
+        background-color: #fff !important;
+        color: #000 !important;
+        padding: 6px 8px !important;
+      }
+
+      canvas {
+        max-width: 100% !important;
+        max-height: 220px !important;
+      }
+
+      footer {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="py-3 py-md-4">
+
+  <div class="container main-container px-3">
+    
+    <!-- HEADER DASHBOARD -->
+    <div class="header-banner mb-4 d-flex align-items-center justify-content-between">
+      <div class="z-1">
+        <span class="badge bg-white bg-opacity-15 text-white fw-semibold px-3 py-1 mb-2 rounded-pill fs-7 backdrop-blur">
+          <i class="fa-solid fa-chart-pie me-1"></i> Dashboard Evaluasi Guru
+        </span>
+        <h3 class="fw-extrabold mb-1 text-white">Analisis Hasil & Diagnosa CBT TKA</h3>
+        <p class="mb-0 text-white-50 fs-7">SMK Negeri 1 Salatiga • Real-time Automated Analytics</p>
+      </div>
+      <div class="d-flex align-items-center gap-3 z-1">
+        <button type="button" onclick="cetakDashboard()" class="btn btn-light text-primary fw-bold border-0 shadow-sm px-3 py-2 rounded-3 no-print">
+          <i class="fa-solid fa-file-pdf me-1 text-danger"></i> Export PDF / Cetak
+        </button>
+        <img src="https://lh3.googleusercontent.com/d/1alNiiB7qgMG7sGsomKJ9UBq4msl9Gzzn" alt="Logo Sekolah" class="header-logo d-none d-sm-block">
+      </div>
+    </div>
+
+    <!-- PANEL FILTER MULTI-KEY (PAKET, KELAS, JURUSAN) -->
+    <div class="card card-modern p-3 mb-4 no-print">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-5">
+          <label class="form-label fw-bold text-secondary mb-1 fs-7">Pilih Paket Ujian:</label>
+          <select class="form-select border-slate fs-6 rounded-3" id="selectPaketGuru" onchange="muatDataDashboard()">
+            <option value="" disabled selected>Memuat daftar paket...</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-bold text-secondary mb-1 fs-7">Filter Kelas:</label>
+          <select class="form-select border-slate fs-6 rounded-3" id="selectKelasGuru" onchange="muatDataDashboard()">
+            <option value="semua">Semua Kelas</option>
+            <option value="XI">Kelas XI</option>
+            <option value="XII">Kelas XII</option>
+            <option value="XIII">Kelas XIII</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-bold text-secondary mb-1 fs-7">Filter Jurusan (Ketik):</label>
+          <div class="input-group">
+            <input type="text" class="form-control border-slate fs-6 rounded-start-3" id="inputJurusanGuru" placeholder="Misal: AKL 2 (kosong = semua)" oninput="muatDataDashboardWithDebounce()">
+            <button class="btn btn-primary rounded-end-3 px-3" onclick="muatDataDashboard()">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- METRIC CARDS (RINGKASAN EKSEKUTIF) -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="metric-card d-flex align-items-center gap-3">
+          <div class="metric-icon bg-indigo-subtle text-indigo" style="background-color: #e0e7ff; color: #4338ca;">
+            <i class="fa-solid fa-user-group"></i>
+          </div>
+          <div>
+            <small class="text-muted d-block fw-semibold fs-7">Total Peserta</small>
+            <h3 class="fw-extrabold mb-0 text-dark" id="mTotalPeserta">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="metric-card d-flex align-items-center gap-3">
+          <div class="metric-icon bg-emerald-subtle text-emerald" style="background-color: #d1fae5; color: #047857;">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div>
+            <small class="text-muted d-block fw-semibold fs-7">Rata-Rata Kelas</small>
+            <h3 class="fw-extrabold mb-0 text-dark" id="mAvgNilai">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="metric-card d-flex align-items-center gap-3">
+          <div class="metric-icon bg-sky-subtle text-sky" style="background-color: #e0f2fe; color: #0369a1;">
+            <i class="fa-solid fa-award"></i>
+          </div>
+          <div>
+            <small class="text-muted d-block fw-semibold fs-7">Nilai Tertinggi</small>
+            <h3 class="fw-extrabold mb-0 text-dark" id="mMaxNilai">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="metric-card d-flex align-items-center gap-3">
+          <div class="metric-icon bg-rose-subtle text-rose" style="background-color: #ffe4e6; color: #be123c;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <small class="text-muted d-block fw-semibold fs-7">Nilai Terendah</small>
+            <h3 class="fw-extrabold mb-0 text-dark" id="mMinNilai">0</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRAFIK KOMPETENSI & ITEM ANALYSIS -->
+    <div class="row g-4 mb-4">
+      <!-- Grafik Capaian Kompetensi -->
+      <div class="col-md-6">
+        <div class="card card-modern p-4 h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-chart-column text-primary me-2"></i>Rerata Capaian Kompetensi (%)</h6>
+            <span class="badge bg-light text-secondary border fs-8 fw-semibold">Standard Pusmendik</span>
+          </div>
+          <div style="height: 260px;" class="d-flex align-items-center justify-content-center">
+            <canvas id="chartKompetensi"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Soal Paling Banyak Salah -->
+      <div class="col-md-6">
+        <div class="card card-modern p-4 h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h6 class="fw-bold text-dark mb-0"><i class="fa-solid fa-fire text-danger me-2"></i>Peta Soal Paling Menjebak</h6>
+            <span class="badge bg-danger-subtle text-danger fs-8 fw-bold">Top 5 Misconceptions</span>
+          </div>
+          <div class="list-group list-group-flush" id="listSoalSulit">
+            <small class="text-muted py-3 text-center">Pilih paket ujian terlebih dahulu...</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABEL REKAP NILAI SISWA (RANKING TERINGGI -> TERENDAH) -->
+    <div class="card card-modern p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-list-check text-primary me-2"></i>Daftar Hasil & Diagnosa Individual Siswa</h6>
+          <p class="text-muted mb-0 fs-7">Terurut otomatis dari nilai tertinggi ke terendah</p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr class="text-secondary fs-7 text-uppercase" style="background-color: #f8fafc;">
+              <th style="width: 40px;" class="py-3">No</th>
+              <th class="py-3">Nama Siswa</th>
+              <th class="py-3">Kelas / Jurusan</th>
+              <th class="text-center py-3">Nilai Akhir</th>
+              <th style="width: 120px;" class="py-3">Tekstual</th>
+              <th style="width: 120px;" class="py-3">Inferensial</th>
+              <th style="width: 120px;" class="py-3">Evaluasi</th>
+              <th class="text-center py-3">Integritas</th>
+              <th class="py-3">Rekomendasi Diagnosa</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyHasil">
+            <tr>
+              <td colspan="9" class="text-center py-4 text-muted">Belum ada data yang ditampilkan.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER DEVELOPER SIGNATURE -->
+  <footer>
+    <div class="container">
+      <p class="mb-1 fw-semibold">AI TKA English CBT Platform • Ver 3.8 © 2026</p>
+      <p class="mb-0 fs-7">Designed & Developed by <strong>Fajar Kurniawan, S.Pd</strong></p>
+    </div>
+  </footer>
+
+  <script>
+    let myChart = null;
+    let debounceTimerGuru;
+
+    window.onload = function() {
+      google.script.run
+        .withSuccessHandler(populatePaketGuru)
+        .withFailureHandler(function(err) { alert("Gagal memuat paket: " + err.message); })
+        .getDaftarPaketAktif();
+    };
+
+    function populatePaketGuru(listPaket) {
+      const select = document.getElementById('selectPaketGuru');
+      select.innerHTML = '';
+
+      if (!listPaket || listPaket.length === 0) {
+        select.innerHTML = '<option value="" disabled selected>Belum ada paket ujian aktif</option>';
+        return;
+      }
+
+      select.innerHTML = '<option value="" disabled selected>-- Pilih Paket Ujian yang Di-analisis --</option>';
+      listPaket.forEach(pkt => {
+        const opt = document.createElement('option');
+        opt.value = pkt.idPaket;
+        opt.innerText = `${pkt.namaPaket} (${pkt.jumlahSoal} Soal)`;
+        select.appendChild(opt);
+      });
+    }
+
+    function muatDataDashboardWithDebounce() {
+      clearTimeout(debounceTimerGuru);
+      debounceTimerGuru = setTimeout(muatDataDashboard, 400);
+    }
+
+    function muatDataDashboard() {
+      const idPaket = document.getElementById('selectPaketGuru').value;
+      const kelas = document.getElementById('selectKelasGuru').value;
+      const jurusan = document.getElementById('inputJurusanGuru').value.trim();
+
+      if (!idPaket) return;
+
+      google.script.run
+        .withSuccessHandler(renderDashboardUI)
+        .withFailureHandler(function(err) { alert("Gagal mengambil data dashboard: " + err.message); })
+        .getDashboardData(idPaket, kelas, jurusan);
+    }
+
+    function renderDashboardUI(res) {
+      if (res.status !== "success") {
+        alert("Error: " + res.message);
+        return;
+      }
+
+      // 1. Update Metric Cards
+      document.getElementById('mTotalPeserta').innerText = res.totalPeserta;
+      document.getElementById('mAvgNilai').innerText = res.metrics.avgNilai;
+      document.getElementById('mMaxNilai').innerText = res.metrics.maxNilai;
+      document.getElementById('mMinNilai').innerText = res.metrics.minNilai;
+
+      // 2. Render Chart.js
+      renderChartKompetensi(res.metrics.avgTekstual, res.metrics.avgInferensial, res.metrics.avgEvaluasi);
+
+      // 3. Render Soal Paling Sulit (Item Analysis)
+      const containerSoal = document.getElementById('listSoalSulit');
+      containerSoal.innerHTML = '';
+      if (!res.soalSulit || res.soalSulit.length === 0) {
+        containerSoal.innerHTML = '<small class="text-muted py-3 text-center">Belum ada data analisis kesalahan soal.</small>';
+      } else {
+        res.soalSulit.forEach(soal => {
+          containerSoal.innerHTML += `
+            <div class="list-group-item px-0 border-0 mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="fw-bold text-dark fs-7">Soal #${soal.nomor} <span class="text-muted font-normal">(${soal.kompetensi})</span></span>
+                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill fw-bold fs-8">${soal.pctSalah}% Salah</span>
+              </div>
+              <p class="mb-1 text-secondary small text-truncate" style="max-width: 420px;">${soal.pertanyaan}</p>
+              <small class="text-muted fs-8">Kunci Jawaban: <span class="badge bg-light text-dark border font-mono">${soal.kunci}</span></small>
+            </div>
+          `;
+        });
+      }
+
+      // 4. Render Tabel Hasil Siswa (Terurut Nilai Tertinggi -> Terendah)
+      const tbody = document.getElementById('tbodyHasil');
+      tbody.innerHTML = '';
+
+      if (!res.listSiswa || res.listSiswa.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted fs-7">Belum ada siswa yang mengerjakan sesuai filter ini.</td></tr>`;
+        return;
+      }
+
+      // Urutkan nilai siswa terbesar ke terkecil
+      res.listSiswa.sort((a, b) => b.nilai - a.nilai);
+
+      res.listSiswa.forEach((s, idx) => {
+        const badgeClass = s.nilai >= 75 ? 'badge-score-high' : 'badge-score-low';
+        
+        // Status Anti-Cheat Badge
+        const pCount = s.pelanggaran || 0;
+        let integrityBadge = '';
+        if (pCount === 0) {
+          integrityBadge = `<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill fs-8"><i class="fa-solid fa-shield-halved me-1"></i>Aman</span>`;
+        } else {
+          integrityBadge = `<span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-2 py-1 rounded-pill fs-8"><i class="fa-solid fa-triangle-exclamation me-1"></i>${pCount}x Pindah Tab</span>`;
+        }
+        
+        tbody.innerHTML += `
+          <tr>
+            <td class="fw-medium text-muted fs-7">${idx + 1}</td>
+            <td class="fw-bold text-dark fs-7">${s.nama}</td>
+            <td class="text-secondary fs-7">${s.kelas}</td>
+            <td class="text-center"><span class="badge ${badgeClass} fs-6 px-3 py-1 rounded-pill">${s.nilai}</span></td>
+            <td>
+              <div class="d-flex justify-content-between align-items-center mb-1 fs-8 fw-semibold text-primary">
+                <span>${s.tekstual}%</span>
+              </div>
+              <div class="comp-progress">
+                <div class="progress-bar bg-primary" style="width: ${s.tekstual}%"></div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex justify-content-between align-items-center mb-1 fs-8 fw-semibold" style="color:#6366f1;">
+                <span>${s.inferensial}%</span>
+              </div>
+              <div class="comp-progress">
+                <div class="progress-bar" style="width: ${s.inferensial}%; background-color: #6366f1;"></div>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex justify-content-between align-items-center mb-1 fs-8 fw-semibold" style="color:#8b5cf6;">
+                <span>${s.evaluasi}%</span>
+              </div>
+              <div class="comp-progress">
+                <div class="progress-bar" style="width: ${s.evaluasi}%; background-color: #8b5cf6;"></div>
+              </div>
+            </td>
+            <td class="text-center">${integrityBadge}</td>
+            <td class="fs-7 text-secondary">${s.diagnosa}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderChartKompetensi(tekstual, inferensial, evaluasi) {
+      const ctx = document.getElementById('chartKompetensi').getContext('2d');
+      if (myChart) myChart.destroy();
+
+      myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Tekstual', 'Inferensial', 'Evaluasi'],
+          datasets: [{
+            label: 'Capaian Rerata (%)',
+            data: [tekstual, inferensial, evaluasi],
+            backgroundColor: ['#4f46e5', '#6366f1', '#8b5cf6'],
+            borderRadius: 10,
+            barThickness: 38
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { 
+              beginAtZero: true, 
+              max: 100,
+              grid: { color: '#f1f5f9' }
+            },
+            x: {
+              grid: { display: false }
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    }
+
+    // FUNGSI PRINT / EXPORT PDF
+    function cetakDashboard() {
+      const selectPaket = document.getElementById('selectPaketGuru');
+      const namaPaket = selectPaket.options[selectPaket.selectedIndex] ? selectPaket.options[selectPaket.selectedIndex].text : "TKA";
+      const originalTitle = document.title;
+      
+      document.title = "Laporan_CBT_" + namaPaket.replace(/[^a-zA-Z0-9]/g, "_");
+      window.print();
+      document.title = originalTitle;
+    }
+  </script>
+</body>
+</html>
